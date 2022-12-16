@@ -68,7 +68,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDProker, NamaProker
-        FROM ProgramKerja ORDER BY IDProker asc ";
+        FROM ProgramKerja WHERE Deleted=0 ORDER BY IDProker asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -108,7 +108,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDDivisi, NamaDivisi
-        FROM Divisi ORDER BY IDDivisi asc ";
+        FROM Divisi WHERE Deleted=0 ORDER BY IDDivisi asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );

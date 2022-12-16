@@ -78,7 +78,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDKaryawan, Nama
-        FROM Karyawan ORDER BY IDKaryawan asc ";
+        FROM Karyawan WHERE Deleted=0 ORDER BY IDKaryawan asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -116,28 +116,65 @@ include('navbar1.php');
         <th scope="col">Nama Divisi</th>
         <th scope="col">Bidang</th>
         <th scope="col">ID Kepala Divisi</th>
+        <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php
     include('connection.php');
-    // untuk nampilin data
-    $no=1;
-    $getDivisi = "SELECT * from [Divisi]";
-    $stmt = sqlsrv_query($conn,$getDivisi);
 
-    while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
-        echo "<tr>
-        <td>$no</td>
-        <td>$tampil[IDDivisi]</td>
-        <td>$tampil[NamaDivisi]</td>
-        <td>$tampil[Bidang]</td>
-        <td>$tampil[IDKaryawanKepala]</td>
-        </tr>";
-        $no++;
-    }
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close($conn);
+// untuk delete(update) data
+if(isset($_GET['IDDivisi'])){
+  $IDDivisi=$_GET['IDDivisi'];
+  $del = "UPDATE Divisi SET Deleted=1 WHERE IDDivisi='$IDDivisi'";
+  $stmt = sqlsrv_query($conn,$del);
+}
+
+// untuk nampilin data karyawan
+$no=1;
+$params = array();
+$options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+$stmt = sqlsrv_query($conn,"SELECT * from Divisi WHERE Deleted=0", $params, $options);
+
+$num = sqlsrv_num_rows($stmt);
+if($num>0){
+  while($tampil=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+
+    echo "<tr>
+      <td>".$no."</td>
+      <td>".$tampil['IDDivisi']."</td>
+      <td>".$tampil['NamaDivisi']."</td>
+      <td>".$tampil['Bidang']."</td>
+      <td>".$tampil['IDKaryawanKepala']."</td>
+      <td>
+        <a href='divisi.php?IDDivisi=".$tampil['IDDivisi']."' class='btn btn-primary'>Delete</a>
+      </td>
+      </tr>";
+      $no++;
+
+  }
+}
+
+sqlsrv_free_stmt($stmt);
+sqlsrv_close($conn);
+
+    // untuk nampilin data
+    // $no=1;
+    // $getDivisi = "SELECT * from [Divisi]";
+    // $stmt = sqlsrv_query($conn,$getDivisi);
+
+    // while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+    //     echo "<tr>
+    //     <td>$no</td>
+    //     <td>$tampil[IDDivisi]</td>
+    //     <td>$tampil[NamaDivisi]</td>
+    //     <td>$tampil[Bidang]</td>
+    //     <td>$tampil[IDKaryawanKepala]</td>
+    //     </tr>";
+    //     $no++;
+    // }
+    // sqlsrv_free_stmt($stmt);
+    // sqlsrv_close($conn);
     ?>
     </tbody>
   </table>

@@ -10,20 +10,21 @@ function getData(){
 
 if(isset($_POST['login'])){
   $info = getData();
-  $login = sqlsrv_query($conn,"SELECT * FROM [Karyawan] WHERE ([IDKaryawan])='$info[2]'");
+  $params = array();
+  $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+  $login = sqlsrv_query($conn,"SELECT * FROM [Karyawan] WHERE ([IDKaryawan])='$info[2]'", $params, $options);
   $ketemu = sqlsrv_num_rows($login);
-  if($ketemu >= 0){
+  // echo "<script>console.log($login, 'login');</script>";
+  // echo "<script>console.log($ketemu, 'ketemu');</script>";
+  if($ketemu === 0){
+    echo "<script>alert('Username atau Password salah!');</script>";
+  }
+  else if ($ketemu === 1) {
     header('Location: http://localhost/MyAdmin/home.php');
     exit;
   }
-  elseif($ketemu == false) {
-    echo "<script>alert('Username atau Password salah!');</script>";
-  }
 
 } 
-
-// $username = $_POST[Nama];
-// $pass = md5 ($_POST[IDKaryawan]);
 
 
 ?>

@@ -101,7 +101,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDDivisi, NamaDivisi
-        FROM Divisi ORDER BY IDDivisi asc ";
+        FROM Divisi WHERE Deleted=0 ORDER BY IDDivisi asc";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -130,7 +130,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDDivisi, NamaDivisi
-        FROM Divisi ORDER BY IDDivisi asc ";
+        FROM Divisi WHERE Deleted=0 ORDER BY IDDivisi asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -160,7 +160,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDKeahlian, NamaKeahlian
-        FROM Keahlian ORDER BY IDKeahlian asc ";
+        FROM Keahlian WHERE Deleted=0 ORDER BY IDKeahlian asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -198,29 +198,47 @@ include('navbar1.php');
         <th scope="col">ID Dewan Pengawas</th>
         <th scope="col">ID Divisi</th>
         <th scope="col">ID Keahlian</th>
+        <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php
     include('connection.php');
+    // untuk delete(update) data
+    if(isset($_GET['IDKaryawan'])){
+      $IDKaryawan=$_GET['IDKaryawan'];
+      $del = "UPDATE Karyawan SET Deleted=1 WHERE IDKaryawan='$IDKaryawan'";
+      $stmt = sqlsrv_query($conn,$del);
+    }
+
     // untuk nampilin data karyawan
     $no=1;
-    $getKaryawan = "SELECT * from [Karyawan]";
-    $stmt = sqlsrv_query($conn,$getKaryawan);
+    $params = array();
+    $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+    $stmt = sqlsrv_query($conn,"SELECT * from Karyawan WHERE Deleted=0", $params, $options);
 
-    while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+    $num = sqlsrv_num_rows($stmt);
+    if($num>0){
+      while($tampil=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+
         echo "<tr>
-        <td>$no</td>
-        <td>$tampil[IDKaryawan]</td>
-        <td>$tampil[Nama]</td>
-        <td>$tampil[Alamat]</td>
-        <td>$tampil[TglLahir]</td>
-        <td>$tampil[IDDivisiDP]</td>
-        <td>$tampil[IDDivisi]</td>
-        <td>$tampil[IDKeahlian]</td>
-        </tr>";
-        $no++;
+          <td>".$no."</td>
+          <td>".$tampil['IDKaryawan']."</td>
+          <td>".$tampil['Nama']."</td>
+          <td>".$tampil['Alamat']."</td>
+          <td>".$tampil['TglLahir']."</td>
+          <td>".$tampil['IDDivisiDP']."</td>
+          <td>".$tampil['IDDivisi']."</td>
+          <td>".$tampil['IDKeahlian']."</td>
+          <td>
+            <a href='karyawan1.php?IDKaryawan=".$tampil['IDKaryawan']."' class='btn btn-primary'>Delete</a>
+          </td>
+          </tr>";
+          $no++;
+  
+      }
     }
+
     sqlsrv_free_stmt($stmt);
     sqlsrv_close($conn);
     ?>

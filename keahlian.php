@@ -80,27 +80,61 @@ include('navbar1.php');
         <th scope="col">ID Keahlian</th>
         <th scope="col">Nama Keahlian</th>
         <th scope="col">Keterangan</th>
+        <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php
     include('connection.php');
-    // untuk nampilin data
-    $no=1;
-    $getKH = "SELECT * from [Keahlian]";
-    $stmt = sqlsrv_query($conn,$getKH);
 
-    while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
-        echo "<tr>
-        <td>$no</td>
-        <td>$tampil[IDKeahlian]</td>
-        <td>$tampil[NamaKeahlian]</td>
-        <td>$tampil[Keterangan]</td>
-        </tr>";
-        $no++;
+                          // untuk delete(update) data
+    if(isset($_GET['IDKeahlian'])){
+      $IDKeahlian=$_GET['IDKeahlian'];
+      $del = "UPDATE Keahlian SET Deleted=1 WHERE IDKeahlian='$IDKeahlian'";
+      $stmt = sqlsrv_query($conn,$del);
     }
-    sqlsrv_free_stmt($stmt);
-    sqlsrv_close($conn);
+
+    // untuk nampilin data karyawan
+    $no=1;
+    $params = array();
+    $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+    $stmt = sqlsrv_query($conn,"SELECT * from Keahlian WHERE Deleted=0", $params, $options);
+
+    $num = sqlsrv_num_rows($stmt);
+    if($num>0){
+      while($tampil=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+
+        echo "<tr>
+          <td>".$no."</td>
+          <td>".$tampil['IDKeahlian']."</td>
+          <td>".$tampil['NamaKeahlian']."</td>
+          <td>".$tampil['Keterangan']."</td>
+          <td>
+            <a href='keahlian.php?IDKeahlian=".$tampil['IDKeahlian']."' class='btn btn-primary'>Delete</a>
+          </td>
+          </tr>";
+          $no++;
+  
+      }
+    }
+
+
+    // untuk nampilin data
+    // $no=1;
+    // $getKH = "SELECT * from [Keahlian]";
+    // $stmt = sqlsrv_query($conn,$getKH);
+
+    // while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+    //     echo "<tr>
+    //     <td>$no</td>
+    //     <td>$tampil[IDKeahlian]</td>
+    //     <td>$tampil[NamaKeahlian]</td>
+    //     <td>$tampil[Keterangan]</td>
+    //     </tr>";
+    //     $no++;
+    // }
+    // sqlsrv_free_stmt($stmt);
+    // sqlsrv_close($conn);
     ?>
     </tbody>
   </table>

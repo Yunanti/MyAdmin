@@ -108,27 +108,61 @@ include('navbar1.php');
         <th scope="col">ID Jabatan</th>
         <th scope="col">Nama Jabatan</th>
         <th scope="col">Keterangan</th>
+        <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php
     include('connection.php');
-    // untuk nampilin data
-    $no=1;
-    $getProker = "SELECT * from [Pangkat]";
-    $stmt = sqlsrv_query($conn,$getProker);
-
-    while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
-        echo "<tr>
-        <td>$no</td>
-        <td>$tampil[IDPangkat]</td>
-        <td>$tampil[NamaKepangkatan]</td>
-        <td>$tampil[Keterangan]</td>
-        </tr>";
-        $no++;
+        // untuk delete(update) data
+    if(isset($_GET['IDPangkat'])){
+      $IDPangkat=$_GET['IDPangkat'];
+      $del = "UPDATE Pangkat SET Deleted=1 WHERE IDPangkat='$IDPangkat'";
+      $stmt = sqlsrv_query($conn,$del);
     }
+
+    // untuk nampilin data karyawan
+    $no=1;
+    $params = array();
+    $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+    $stmt = sqlsrv_query($conn,"SELECT * from Pangkat WHERE Deleted=0", $params, $options);
+
+    $num = sqlsrv_num_rows($stmt);
+    if($num>0){
+      while($tampil=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+
+        echo "<tr>
+          <td>".$no."</td>
+          <td>".$tampil['IDPangkat']."</td>
+          <td>".$tampil['NamaKepangkatan']."</td>
+          <td>".$tampil['Keterangan']."</td>
+          <td>
+            <a href='pangkat.php?IDPangkat=".$tampil['IDPangkat']."' class='btn btn-primary'>Delete</a>
+          </td>
+          </tr>";
+          $no++;
+  
+      }
+    }
+
     sqlsrv_free_stmt($stmt);
     sqlsrv_close($conn);
+    // untuk nampilin data
+    // $no=1;
+    // $getProker = "SELECT * from [Pangkat]";
+    // $stmt = sqlsrv_query($conn,$getProker);
+
+    // while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+    //     echo "<tr>
+    //     <td>$no</td>
+    //     <td>$tampil[IDPangkat]</td>
+    //     <td>$tampil[NamaKepangkatan]</td>
+    //     <td>$tampil[Keterangan]</td>
+    //     </tr>";
+    //     $no++;
+    // }
+    // sqlsrv_free_stmt($stmt);
+    // sqlsrv_close($conn);
     ?>
     </tbody>
   </table>
@@ -152,7 +186,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDKaryawan, Nama
-        FROM Karyawan ORDER BY IDKaryawan asc ";
+        FROM Karyawan WHERE Deleted=0 ORDER BY IDKaryawan asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );
@@ -182,7 +216,7 @@ include('navbar1.php');
 
         <?php
         $sql = "SELECT distinct IDPangkat, NamaKepangkatan
-        FROM Pangkat ORDER BY IDPangkat asc ";
+        FROM Pangkat WHERE Deleted=0 ORDER BY IDPangkat asc ";
 
         $params = array();
         $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET );

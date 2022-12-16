@@ -82,27 +82,63 @@ include('navbar1.php');
         <th scope="col">ID Program Kerja</th>
         <th scope="col">Nama Program Kerja</th>
         <th scope="col">Keterangan</th>
+        <th scope="col">Aksi</th>
       </tr>
     </thead>
     <tbody>
     <?php
     include('connection.php');
-    // untuk nampilin data
-    $no=1;
-    $getProker = "SELECT * from [ProgramKerja]";
-    $stmt = sqlsrv_query($conn,$getProker);
 
-    while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
-        echo "<tr>
-        <td>$no</td>
-        <td>$tampil[IDProker]</td>
-        <td>$tampil[NamaProker]</td>
-        <td>$tampil[Keterangan]</td>
-        </tr>";
-        $no++;
+    // untuk delete(update) data
+    if(isset($_GET['IDProker'])){
+      $IDProker=$_GET['IDProker'];
+      $del = "UPDATE ProgramKerja SET Deleted=1 WHERE IDProker='$IDProker'";
+      $stmt = sqlsrv_query($conn,$del);
     }
+
+    // untuk nampilin data karyawan
+    $no=1;
+    $params = array();
+    $options = array("Scrollable" => SQLSRV_CURSOR_KEYSET);
+    $stmt = sqlsrv_query($conn,"SELECT * from ProgramKerja WHERE Deleted=0", $params, $options);
+
+    $num = sqlsrv_num_rows($stmt);
+    if($num>0){
+      while($tampil=sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+
+        echo "<tr>
+          <td>".$no."</td>
+          <td>".$tampil['IDProker']."</td>
+          <td>".$tampil['NamaProker']."</td>
+          <td>".$tampil['Keterangan']."</td>
+          <td>
+            <a href='proker.php?IDProker=".$tampil['IDProker']."' class='btn btn-primary'>Delete</a>
+          </td>
+          </tr>";
+          $no++;
+  
+      }
+    }
+
     sqlsrv_free_stmt($stmt);
     sqlsrv_close($conn);
+
+    // untuk nampilin data
+    // $no=1;
+    // $getProker = "SELECT * from [ProgramKerja]";
+    // $stmt = sqlsrv_query($conn,$getProker);
+
+    // while($tampil = sqlsrv_fetch_array($stmt,SQLSRV_FETCH_ASSOC)){
+    //     echo "<tr>
+    //     <td>$no</td>
+    //     <td>$tampil[IDProker]</td>
+    //     <td>$tampil[NamaProker]</td>
+    //     <td>$tampil[Keterangan]</td>
+    //     </tr>";
+    //     $no++;
+    // }
+    // sqlsrv_free_stmt($stmt);
+    // sqlsrv_close($conn);
     ?>
     </tbody>
   </table>
